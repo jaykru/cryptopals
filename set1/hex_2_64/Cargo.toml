@@ -1,0 +1,7 @@
+[package]
+name = "hex_2_64"
+version = "0.1.0"
+authors = ["Jay Kruer <jaykruer@posteo.de>"]
+edition = "2018"
+
+[dependencies]
