@@ -1,3 +1,5 @@
+use std::collections::BitVec;
+
 // converts a character denoting a hex digit in 0123456789abcdef to
 // the numerical value it represents
 fn hex_digit(u: u8) -> Option<u8> {
@@ -36,14 +38,29 @@ fn as_bytes(s: String) -> Option<Vec<u8>> {
     }
 }
 
-fn byte_to_base64_char(u: u8) -> char {
-    match u {
-        41 ... 
+fn triple_octet_to_bits(u8s: Vec<u8>) -> Option(BitVec) {
+    let b = BitVec::from_bytes(&u8s);
+    match u8s.len() {
+        3 => Some(b),
+        2 => Some(b.append(&[false, false])),
+        1 => Some(b.append(&[false, false, false, false])),
+        _ => None,
     }
 }
 
-fn to_base64(Vec<u8>) -> String {
-    
+fn triple_octet_to_base64(u8s: Vec<u8>) -> String {
+    match u8s.len() {
+        1 => {
+            let p = "=";
+            let b = triple_octet_to_bits;
+        },
+        2 => { 
+            let p = "=="; 
+        },
+        3 => {
+            let 
+        _ => None,
+    }
 }
 
 fn main() {
