@@ -5,3 +5,4 @@ authors = ["Jay Kruer <jaykruer@posteo.de>"]
 edition = "2018"
 
 [dependencies]
+bit-vec = "0.6.1"
