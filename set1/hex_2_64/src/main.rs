@@ -70,24 +70,27 @@ fn triple_octet_to_bits(u8s: Vec<u8>) -> Option<BitVec> {
 fn u8_b64_pp(u: u8) -> Option<String> {
     match u {
         0 ..= 25 => {
-            let nu = u + 41;
+            let nu = u + 65;
             if let Ok(s) = String::from_utf8(vec![nu]) {
+                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 None
             }
         },
         26 ..= 51 => {
-            let nu = u + 71;
+            let nu = u + 97;
             if let Ok(s) = String::from_utf8(vec![nu]) {
+                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 None
             }
         },
         52 ..= 61 => {
-            let nu = u - 3;
+            let nu = u - 4;
             if let Ok(s) = String::from_utf8(vec![nu]) {
+                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 None
@@ -103,7 +106,7 @@ fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
     let mut e = 0;
     let mut s = 0;
     while let Some(b) = bits.pop() {
-        // we have too many bits to fit into a u8
+        // fail if we have too many bits to fit into a u8
         if e >= 8 {
             return None;
         }
@@ -118,16 +121,14 @@ fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
 
 fn octets_to_base64(u8s: Vec<u8>) -> Option<String> {
     let triples = u8s.chunks(3); // deal with three octets at a time while converting
-    let triple_bits = triples.filter_map(|t| triple_octet_to_bits(t.to_vec())); // convert each triple of octets into the corresponding bits
-    let all_bits: BitVec = triple_bits.flatten().collect();
-    let all_bits_vec: Vec<bool> = all_bits.into_iter().collect();
-    let sextets = all_bits_vec.chunks(6);
+    let triple_bits = triples.filter_map(|t| triple_octet_to_bits(t.to_vec())).flatten().collect::<BitVec>().into_iter().collect::<Vec<bool>>(); // convert each triple of octets into the corresponding bits
+    let sextets = triple_bits.chunks(6);
     // if we don't have three octets in the last group, we add an = sign for each missing octet
     let pad = match u8s.len() % 3 {
         0 => "",
         1 => "==",
         2 => "=",
-        _ => {
+        _ => { // absurd
             return None;
         },
     };
@@ -146,10 +147,14 @@ fn hex_2_base64(hex: String) -> Option<String> {
 
 
 fn main() {
+    if let Some(ex) = octets_to_base64(vec![0]) {
+        assert_eq!("A==", ex);
+    }
+    
     let expected_out = Some("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".to_string());
     let out = hex_2_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".to_string());
     
-assert_eq!(expected_out, out);
+    assert_eq!(expected_out, out);
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         println!("Usage: {} [bytes in hex to encode as base64]", &args[0]);
