@@ -4,7 +4,6 @@ use std::env;
 // converts a character denoting a hex digit in 123456788abcdef to the
 // numerical value it represents
 
-// TESTING: Ok.
 fn hex_digit(u: u8) -> Option<u8> {
     match u {
         48 ..= 57 => Some(u - 48), // 0 - 9 represent 0 through 9
@@ -13,7 +12,6 @@ fn hex_digit(u: u8) -> Option<u8> {
     }
 }
 
-// TESTING: OK.
 fn pair_to_num(p: Vec<u8>) -> Option<u8> {
     match &p[..]{
         [first, second] => {
@@ -36,7 +34,6 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
 // in a hexadecimal representation as to the left, a vector of the
 // bytes represented by the pretty printed string.
 
-// testing: OK.
 fn hexstr_as_bytes(s: String) -> Option<Vec<u8>> {
     let chars = s.into_bytes();
     let pairs = chars.chunks(2);
@@ -47,7 +44,6 @@ fn hexstr_as_bytes(s: String) -> Option<Vec<u8>> {
         }
         Some(nums)
     } else {
-        println!("failed");
         unreachable!();
     }
 }
@@ -57,10 +53,8 @@ fn test_hex_str_bytes() {
     assert_eq!(hexstr_as_bytes("49276d206b696c6c".to_string()), Some(vec![0x49, 0x27, 0x6d, 0x20, 0x6b, 0x69, 0x6c, 0x6c]));
 }
 
-// testing: OK.
 fn octets_to_b64bits(u8s: Vec<u8>) -> BitVec {
     let b = BitVec::from_bytes(&u8s);
-    println!("b ({:?}) of len%3 == {}", b, u8s.len() % 3);
     match u8s.len() % 3 {
         0 => b,
         1 => {
@@ -87,7 +81,6 @@ fn u8_b64_pp(u: u8) -> Option<String> {
         0 ..= 25 => {
             let nu = u + 65;
             if let Ok(s) = String::from_utf8(vec![nu]) {
-                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 unreachable!()
@@ -95,9 +88,7 @@ fn u8_b64_pp(u: u8) -> Option<String> {
         },
         26 ..= 51 => {
             let nu = u + 71;
-            println!("nu: {}", nu);
             if let Ok(s) = String::from_utf8(vec![nu]) {
-                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 unreachable!();
@@ -106,7 +97,6 @@ fn u8_b64_pp(u: u8) -> Option<String> {
         52 ..= 61 => {
             let nu = u - 4;
             if let Ok(s) = String::from_utf8(vec![nu]) {
-                println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
                 unreachable!();
@@ -118,28 +108,6 @@ fn u8_b64_pp(u: u8) -> Option<String> {
     }
 }
 
-// Useful for debugging
-// fn u8s_b64_pp(us: Vec<u8>) -> Option<String> {
-//    let mut acc = String::from("");
-//    for u in us {
-//        if let Some(up) = u8_b64_pp(u) {
-//            acc.push_str(&up);
-//        } else {
-//            unreachable!();
-//        }
-//    };
-//    Some(acc)
-// }
-
-// #[test]
-// fn u8s_b64_pp_tests() {
-//     let tv: Vec<u8> = (0..63).collect();
-//     if let Some(o) = u8s_b64_pp(tv) {
-//         println!("{:?}", o);
-//     }
-// }
-
-// TESTING: Ok!
 fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
     let mut e = 0;
     let mut s = 0;
