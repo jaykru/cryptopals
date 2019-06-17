@@ -1,9 +1,10 @@
+///* set 1, challenge 1 *///
 use bit_vec::BitVec;
-use std::env;
+
+
 
 // converts a character denoting a hex digit in 123456788abcdef to the
 // numerical value it represents
-
 fn hex_digit(u: u8) -> Option<u8> {
     match u {
         48 ..= 57 => Some(u - 48), // 0 - 9 represent 0 through 9
@@ -34,7 +35,7 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
 // in a hexadecimal representation as to the left, a vector of the
 // bytes represented by the pretty printed string.
 
-fn hexstr_as_bytes(s: String) -> Option<Vec<u8>> {
+pub fn hex_as_bytes(s: String) -> Option<Vec<u8>> {
     let chars = s.into_bytes();
     let pairs = chars.chunks(2);
     let nums: Vec<u8> = pairs.filter_map(|p| pair_to_num(p.to_vec())).collect();
@@ -50,7 +51,7 @@ fn hexstr_as_bytes(s: String) -> Option<Vec<u8>> {
 
 #[test]
 fn test_hex_str_bytes() {
-    assert_eq!(hexstr_as_bytes("49276d206b696c6c".to_string()), Some(vec![0x49, 0x27, 0x6d, 0x20, 0x6b, 0x69, 0x6c, 0x6c]));
+    assert_eq!(hex_as_bytes("49276d206b696c6c".to_string()), Some(vec![0x49, 0x27, 0x6d, 0x20, 0x6b, 0x69, 0x6c, 0x6c]));
 }
 
 fn octets_to_b64bits(u8s: Vec<u8>) -> BitVec {
@@ -141,20 +142,12 @@ fn octets_b64_pp(u8s: Vec<u8>) -> Option<String> {
     Some(pp)
 }
 
-fn hex_2_base64(hex: String) -> Option<String> {
-    if let Some(octets) = hexstr_as_bytes(hex) {
+pub fn hex_2_base64(hex: String) -> Option<String> {
+    if let Some(octets) = hex_as_bytes(hex) {
         return octets_b64_pp(octets);
     } else {
         return None;
     }
-}
-
-#[test]
-fn test2() {
-    if let Some(ex) = hex_2_base64("41".to_string()) {
-        assert_eq!("QQ==", ex);
-    }
-
 }
 
 #[test]
@@ -163,18 +156,4 @@ fn main_test() {
     let out = hex_2_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".to_string());
     
     assert_eq!(expected_out, out);
-}
-
-fn main() {
-   let args: Vec<String> = env::args().collect();
-    if args.len() < 2 {
-        println!("Usage: {} [bytes in hex to encode as base64]", &args[0]);
-    } else {
-        let input = &args[1];
-        if let Some(output) = hex_2_base64(input.to_string()) {
-            println!("{}", output);
-        } else {
-            println!("Invalid input");
-        }
-    }
 }
