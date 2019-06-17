@@ -3,14 +3,17 @@ use std::env;
 
 // converts a character denoting a hex digit in 123456788abcdef to the
 // numerical value it represents
+
+// TESTING: Ok.
 fn hex_digit(u: u8) -> Option<u8> {
     match u {
         48 ..= 57 => Some(u - 48), // 0 - 9 represent 0 through 9
-        97 ..= 122 => Some(u - 97), // a - f represent 10 through 15
+        97 ..= 122 => Some(u - 87), // a - f represent 10 through 15
         _ => None,
     }
 }
 
+// TESTING: OK.
 fn pair_to_num(p: Vec<u8>) -> Option<u8> {
     match &p[..]{
         [first, second] => {
@@ -18,15 +21,13 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
                 if let Some(s) = hex_digit(*second) {
                     Some(f * 16 + s)
                 } else {
-                    println!("hex_digit({}) in pair_to_num({:?}) failed", *second, p);
                     None
                 }
             } else {
-                println!("hex_digit({}) in pair_to_num({:?}) failed", *first, p);
                 None
             }
         }
-        _ => { println!("hit last pattern in pair_to_num({:?})", p); None}
+        _ => None
     }
 }
 
@@ -34,57 +35,72 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
 // returns, if the input is a valid sequence of bytes pretty printed
 // in a hexadecimal representation as to the left, a vector of the
 // bytes represented by the pretty printed string.
+
+// testing: OK.
 fn hexstr_as_bytes(s: String) -> Option<Vec<u8>> {
     let chars = s.into_bytes();
     let pairs = chars.chunks(2);
     let nums: Vec<u8> = pairs.filter_map(|p| pair_to_num(p.to_vec())).collect();
     if nums.len() == chars.len() / 2 {
+        for i in &nums {
+            format!("{:x}", i);
+        }
         Some(nums)
     } else {
-        None
+        println!("failed");
+        unreachable!();
     }
 }
 
-fn triple_octet_to_bits(u8s: Vec<u8>) -> Option<BitVec> {
+#[test]
+fn test_hex_str_bytes() {
+    assert_eq!(hexstr_as_bytes("49276d206b696c6c".to_string()), Some(vec![0x49, 0x27, 0x6d, 0x20, 0x6b, 0x69, 0x6c, 0x6c]));
+}
+
+// testing: OK.
+fn octets_to_b64bits(u8s: Vec<u8>) -> BitVec {
     let b = BitVec::from_bytes(&u8s);
-    match u8s.len() {
-        3 => Some(b),
-        2 => {
-            /* BitVec iterators seem to be broken, so we just operate on vecs of bools */
-            let mut bi = b.into_iter().collect::<Vec<bool>>();
-            bi.extend(&[false, false]);
-            let bp: BitVec = std::iter::FromIterator::from_iter(bi);
-            Some(bp)
-        },
+    println!("b ({:?}) of len%3 == {}", b, u8s.len() % 3);
+    match u8s.len() % 3 {
+        0 => b,
         1 => {
             /* BitVec iterators seem to be broken, so we just operate on vecs of bools */
             let mut bi = b.into_iter().collect::<Vec<bool>>();
             bi.extend(&[false, false, false, false]);
             let bp: BitVec = std::iter::FromIterator::from_iter(bi);
-            Some(bp)
+            bp
         },
-        _ => None,
+        2 => {
+            /* BitVec iterators seem to be broken, so we just operate on vecs of bools */
+            let mut bi = b.into_iter().collect::<Vec<bool>>();
+            bi.extend(&[false, false]);
+            let bp: BitVec = std::iter::FromIterator::from_iter(bi);
+            bp
+        },
+        _ => unreachable!(), // absurd
     }
 }
 
 fn u8_b64_pp(u: u8) -> Option<String> {
     match u {
+        // 0 - 25 are capital letters.
         0 ..= 25 => {
             let nu = u + 65;
             if let Ok(s) = String::from_utf8(vec![nu]) {
                 println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
-                None
+                unreachable!()
             }
         },
         26 ..= 51 => {
-            let nu = u + 97;
+            let nu = u + 71;
+            println!("nu: {}", nu);
             if let Ok(s) = String::from_utf8(vec![nu]) {
                 println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
-                None
+                unreachable!();
             }
         },
         52 ..= 61 => {
@@ -93,7 +109,7 @@ fn u8_b64_pp(u: u8) -> Option<String> {
                 println!("Converted byte {} to {} yielding char {}", u, nu, s);
                 Some(s)
             } else {
-                None
+                unreachable!();
             }
         },
         62 => Some("+".to_string()),
@@ -102,6 +118,28 @@ fn u8_b64_pp(u: u8) -> Option<String> {
     }
 }
 
+// Useful for debugging
+// fn u8s_b64_pp(us: Vec<u8>) -> Option<String> {
+//    let mut acc = String::from("");
+//    for u in us {
+//        if let Some(up) = u8_b64_pp(u) {
+//            acc.push_str(&up);
+//        } else {
+//            unreachable!();
+//        }
+//    };
+//    Some(acc)
+// }
+
+// #[test]
+// fn u8s_b64_pp_tests() {
+//     let tv: Vec<u8> = (0..63).collect();
+//     if let Some(o) = u8s_b64_pp(tv) {
+//         println!("{:?}", o);
+//     }
+// }
+
+// TESTING: Ok!
 fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
     let mut e = 0;
     let mut s = 0;
@@ -112,17 +150,14 @@ fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
         }
         
         if b {
-            s += 2 ^ e;
+            s += 2_u8.pow(e);
         }
         e += 1;
     };
     Some(s)
 }
 
-fn octets_to_base64(u8s: Vec<u8>) -> Option<String> {
-    let triples = u8s.chunks(3); // deal with three octets at a time while converting
-    let triple_bits = triples.filter_map(|t| triple_octet_to_bits(t.to_vec())).flatten().collect::<BitVec>().into_iter().collect::<Vec<bool>>(); // convert each triple of octets into the corresponding bits
-    let sextets = triple_bits.chunks(6);
+fn octets_b64_pp(u8s: Vec<u8>) -> Option<String> {
     // if we don't have three octets in the last group, we add an = sign for each missing octet
     let pad = match u8s.len() % 3 {
         0 => "",
@@ -132,30 +167,38 @@ fn octets_to_base64(u8s: Vec<u8>) -> Option<String> {
             return None;
         },
     };
-    let mut pp: String = sextets.flat_map(|c| to_byte(c.to_vec())).filter_map(|u| u8_b64_pp(u)).collect::<String>();
+    let sextets = octets_to_b64bits(u8s).into_iter().collect::<Vec<bool>>();
+    let mut pp: String = sextets.chunks(6).flat_map(|c| to_byte(c.to_vec())).filter_map(|u| u8_b64_pp(u)).collect::<String>();
     pp.push_str(&pad);
     Some(pp)
 }
 
 fn hex_2_base64(hex: String) -> Option<String> {
     if let Some(octets) = hexstr_as_bytes(hex) {
-        return octets_to_base64(octets);
+        return octets_b64_pp(octets);
     } else {
         return None;
     }
 }
 
-
-fn main() {
-    if let Some(ex) = octets_to_base64(vec![0]) {
-        assert_eq!("A==", ex);
+#[test]
+fn test2() {
+    if let Some(ex) = hex_2_base64("41".to_string()) {
+        assert_eq!("QQ==", ex);
     }
-    
+
+}
+
+#[test]
+fn main_test() {
     let expected_out = Some("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".to_string());
     let out = hex_2_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".to_string());
     
     assert_eq!(expected_out, out);
-    let args: Vec<String> = env::args().collect();
+}
+
+fn main() {
+   let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
         println!("Usage: {} [bytes in hex to encode as base64]", &args[0]);
     } else {
