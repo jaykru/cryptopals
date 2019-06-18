@@ -1,8 +1,6 @@
 ///* set 1, challenge 1 *///
 use bit_vec::BitVec;
 
-
-
 // converts a character denoting a hex digit in 123456788abcdef to the
 // numerical value it represents
 fn hex_digit(u: u8) -> Option<u8> {
