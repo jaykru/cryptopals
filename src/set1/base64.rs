@@ -43,7 +43,7 @@ pub fn hex_as_bytes(s: String) -> Option<Vec<u8>> {
         }
         Some(nums)
     } else {
-        unreachable!();
+        None
     }
 }
 

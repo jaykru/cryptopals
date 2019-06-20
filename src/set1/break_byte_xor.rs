@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::iter;
 use super::single_xor::*;
 
-fn score(input: &str) -> f64 {
+pub fn score(input: &str) -> f64 {
     let mut char_freqs: HashMap<char, f64> =
         [('e',12.702),
          ('t',9.056),
@@ -68,17 +68,17 @@ fn score(input: &str) -> f64 {
     sum
 }
 
-fn find_best(input: &str) -> String {
+pub fn find_best(input: &str) -> String {
     let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
         if let Ok(bytes) = single_xor(i,key) {
             if let Ok(dec) = std::str::from_utf8(&bytes) {
-                println!("{} [score {}] [key {:x}]", dec, score(dec), key);
+// DEBUG:                println!("{} [score {}] [key {:x}]", dec, score(dec), key);
                 (String::from(dec), score(dec))
             } else {
                 (String::from(""), -1.0)
             }
         } else {
-            unreachable!();
+            (String::from(""), -1.0)
         }});
     let mut best = 0.0;
     let mut best_dec = String::from("");
@@ -88,7 +88,6 @@ fn find_best(input: &str) -> String {
             best_dec = dec;
         }
     }
-
     best_dec
 }
 
