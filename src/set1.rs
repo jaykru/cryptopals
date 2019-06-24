@@ -4,3 +4,4 @@ mod single_xor;
 mod break_byte_xor;
 mod detect_xor;
 mod rotating_xor;
+mod break_rotating_xor;
