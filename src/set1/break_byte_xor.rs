@@ -91,6 +91,28 @@ pub fn find_best(input: &str) -> String {
     best_dec
 }
 
+pub fn find_best_key(input: &[u8]) -> u8 {
+    let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
+        if let Ok(bytes) = single_xor(std::str::from_utf8(i).unwrap(),key) {
+            if let Ok(dec) = std::str::from_utf8(&bytes) {
+                (key, score(dec))
+            } else {
+                unreachable!();
+            }
+        } else {
+            unreachable!();
+        }});
+    let mut best = 0.0;
+    let mut best_key = 0;
+    for (key, score) in with_scores {
+        if score >= best {
+            best = score;
+            best_key = key;
+        }
+    }
+    best_key
+}
+
 #[test]
 fn test_score() {
     assert_eq!(108.079, score("Cooking MC's like a pound of bacon"));
