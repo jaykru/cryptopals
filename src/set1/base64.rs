@@ -1,12 +1,16 @@
 ///* set 1, challenge 1 *///
 use bit_vec::BitVec;
 
+pub enum Error {
+
+}
+
 // converts a character denoting a hex digit in 123456788abcdef to the
 // numerical value it represents
 fn hex_digit(u: u8) -> Option<u8> {
     match u {
         48 ..= 57 => Some(u - 48), // 0 - 9 represent 0 through 9
-        97 ..= 122 => Some(u - 87), // a - f represent 10 through 15
+        97 ..= 102 => Some(u - 87), // a - f represent 10 through 15
         _ => None,
     }
 }
@@ -16,6 +20,7 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
         [first, second] => {
             if let Some(f) = hex_digit(*first) {
                 if let Some(s) = hex_digit(*second) {
+                    println!("f: {}; s: {}",f,s);
                     Some(f * 16 + s)
                 } else {
                     None

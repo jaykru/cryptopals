@@ -4,10 +4,9 @@ use super::base64;
 enum Error {
     DomainErr(String),
     FormatErr(String),
-    OtherErr(String),
 }
 
-use Error::*;
+use Error::{DomainErr, FormatErr};
 
 fn fixed_xor(h1: String, h2: String) -> Result<String, Error> {
     if h1.len() != h2.len() {
