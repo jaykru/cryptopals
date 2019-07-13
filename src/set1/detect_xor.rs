@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fs::File;
-use std::io::{self, BufReader};
 use std::io::BufRead;
+use std::io::{self, BufReader};
 
 use itertools::Itertools; // extents Iterator with all the itertools methods
 
@@ -17,16 +17,27 @@ fn compare_f64(a: f64, b: f64) -> Ordering {
     }
 }
 
-fn compare_scores(a: String, b: String) -> Ordering {
-   compare_f64(score(&a),score(&b))
+fn compare_scores(a: &[u8], b: &[u8]) -> Ordering {
+    compare_f64(score(a), score(b))
 }
 
 fn find_xord_line(filename: &str) -> io::Result<String> {
     let f = File::open(filename)?;
     let f = BufReader::new(f);
 
-    let line = f.lines().sorted_by(|a,b| compare_scores(find_best(a.as_ref().unwrap()),find_best(b.as_ref().unwrap()))).rev().next().unwrap().unwrap();
-    let out = format!("{}: {}", line, find_best(&line));
+    let line = f
+        .lines()
+        .sorted_by(|a, b| {
+            compare_scores(
+                &find_best(&a.as_ref().unwrap().as_bytes()).unwrap(),
+                &find_best(&b.as_ref().unwrap().as_bytes()).unwrap(),
+            )
+        })
+        .rev()
+        .next()
+        .unwrap()
+        .unwrap();
+    let out = format!("{}: {:#?}", line, find_best(&line.as_bytes()));
     Ok(out)
 }
 

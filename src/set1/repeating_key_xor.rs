@@ -1,13 +1,9 @@
 use super::single_xor::*;
 
-fn repeating_key_xor(i: &str, key: &[u8]) -> Result<String,()> {
+fn repeating_key_xor(i: &[u8], key: &[u8]) -> Vec<u8> {
     let period = key.len();
-    let encrypted_bytes: Vec<u8> = i.as_bytes().into_iter().enumerate().map(|(i, b)| b ^ (key.get(i % period)).unwrap()).collect();
-    if let Ok(s) = String::from_utf8(encrypted_bytes) {
-        Ok(s)
-    } else{
-        Err(())
-    }
+    let encrypted_bytes: Vec<u8> = i.into_iter().enumerate().map(|(i, b)| b ^ (key.get(i % period)).unwrap()).collect();
+    encrypted_bytes
 }
 
 #[test]
