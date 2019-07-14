@@ -1,61 +1,6 @@
 ///* set 1, challenge 1 *///
 use bit_vec::BitVec;
-
-pub enum Error {
-
-}
-
-// converts a character denoting a hex digit in 123456788abcdef to the
-// numerical value it represents
-fn hex_digit(u: u8) -> Option<u8> {
-    match u {
-        48 ..= 57 => Some(u - 48), // 0 - 9 represent 0 through 9
-        97 ..= 102 => Some(u - 87), // a - f represent 10 through 15
-        _ => None,
-    }
-}
-
-fn pair_to_num(p: Vec<u8>) -> Option<u8> {
-    match &p[..]{
-        [first, second] => {
-            if let Some(f) = hex_digit(*first) {
-                if let Some(s) = hex_digit(*second) {
-                    println!("f: {}; s: {}",f,s);
-                    Some(f * 16 + s)
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        }
-        _ => None
-    }
-}
-
-// Takes in a string of bytes of the form "deadbeef" and optionally
-// returns, if the input is a valid sequence of bytes pretty printed
-// in a hexadecimal representation as to the left, a vector of the
-// bytes represented by the pretty printed string.
-
-pub fn hex_as_bytes(s: &str) -> Option<Vec<u8>> {
-    let chars = s.as_bytes();
-    let pairs = chars.chunks(2);
-    let nums: Vec<u8> = pairs.filter_map(|p| pair_to_num(p.to_vec())).collect();
-    if nums.len() == chars.len() / 2 {
-        for i in &nums {
-            format!("{:x}", i);
-        }
-        Some(nums)
-    } else {
-        None
-    }
-}
-
-#[test]
-fn test_hex_str_bytes() {
-    assert_eq!(hex_as_bytes("49276d206b696c6c"), Some(vec![0x49, 0x27, 0x6d, 0x20, 0x6b, 0x69, 0x6c, 0x6c]));
-}
+use super::hex::*;
 
 fn octets_to_b64bits(u8s: Vec<u8>) -> BitVec {
     let b = BitVec::from_bytes(&u8s);
@@ -112,7 +57,7 @@ fn u8_b64_pp(u: u8) -> Option<String> {
     }
 }
 
-fn to_byte(mut bits: Vec<bool>) -> Option<u8> {
+pub fn bits_to_byte(mut bits: Vec<bool>) -> Option<u8> {
     let mut e = 0;
     let mut s = 0;
     while let Some(b) = bits.pop() {
@@ -140,7 +85,7 @@ fn octets_b64_pp(u8s: Vec<u8>) -> Option<String> {
         },
     };
     let sextets = octets_to_b64bits(u8s).into_iter().collect::<Vec<bool>>();
-    let mut pp: String = sextets.chunks(6).flat_map(|c| to_byte(c.to_vec())).filter_map(|u| u8_b64_pp(u)).collect::<String>();
+    let mut pp: String = sextets.chunks(6).flat_map(|c| bits_to_byte(c.to_vec())).filter_map(|u| u8_b64_pp(u)).collect::<String>();
     pp.push_str(&pad);
     Some(pp)
 }
@@ -154,7 +99,7 @@ pub fn hex_2_base64(hex: &str) -> Option<String> {
 }
 
 #[test]
-fn main_test() {
+fn challenge1() {
     let expected_out = Some("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".to_string());
     let out = hex_2_base64("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d");
     

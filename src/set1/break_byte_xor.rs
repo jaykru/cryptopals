@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::iter;
 use super::single_xor::*;
+use super::hex::*;
 
 pub fn score(input: &[u8]) -> f64 {
     let mut char_freqs: HashMap<char, f64> =
@@ -61,14 +62,13 @@ pub fn score(input: &[u8]) -> f64 {
     
     let mut sum: f64 = 0.0;
     for u in input {
-        // DEBUG: println!("{} has score {}", *u as char, *char_freqs.entry(*u as char).or_insert(-10.0));
         sum += *char_freqs.entry(*u as char).or_insert(-10.0);
     };
     sum
 }
 
 pub fn find_best(input: &[u8]) -> Option<Vec<u8>> {
-    let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
+    let with_scores = iter::repeat(input).zip(0 ..= std::u8::MAX).map(|(i, key)| { 
         let bytes = single_xor(i,key);
         let score = score(&bytes);
         (bytes, score)
@@ -78,22 +78,14 @@ pub fn find_best(input: &[u8]) -> Option<Vec<u8>> {
     for (bytes, score) in with_scores {
         if score >= best {
             best = score;
-            best_bytes = Some(bytes.clone());
-
-            println!("current best: {} with score: {}", String::from_utf8(bytes.clone()).unwrap(), score);
-        }
-        
-        if let Ok(s) = String::from_utf8(bytes.clone()) {
-            println!("tried: {} with score: {}", s, score);
-        } else {
-            println!("tried unprintable {:#?}", bytes)
+            best_bytes = Some(bytes);
         }
     }
     best_bytes
 }
 
 pub fn find_best_key(input: &[u8]) -> Option<u8> {
-    let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
+    let with_scores = iter::repeat(input).zip(0 ..= std::u8::MAX).map(|(i, key)| { 
         let bytes = single_xor(i,key);
         (key, score(&bytes))
     });
@@ -110,12 +102,22 @@ pub fn find_best_key(input: &[u8]) -> Option<u8> {
 
 #[test]
 fn test_score() {
-    assert_eq!(138.07399999999998, score("Cooking MC's like a pound of bacon".as_bytes()));
+    assert_eq!(164.074, score("Cooking MC's like a pound of bacon".as_bytes()));
 }
 
 #[test]
 fn test_find_best() {
-    if let Ok(s) = String::from_utf8(find_best("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".as_bytes()).unwrap()) {
-        assert_eq!("Cooking MC\'s like a pound of bacon".to_string(), s);
+    if let Some(hb) = hex_as_bytes("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736") {
+        if let Some(b) = find_best(&hb) {
+            if let Ok(s) = String::from_utf8(b) {
+                assert_eq!("Cooking MC\'s like a pound of bacon".to_string(), s);
+            } else {
+                println!("unprintable result!");
+                assert!(false);
+            }
+        } else {
+            println!("find_best failed");
+            assert!(false);
+        }
     }
 }

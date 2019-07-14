@@ -1,6 +1,6 @@
 use super::break_byte_xor::*;
 use super::repeating_key_xor::*;
-use crate::set1::base64::hex_as_bytes;
+use super::hex::*;
 use bit_vec::BitVec;
 use itertools::Itertools;
 use std::convert::TryInto;

@@ -1,4 +1,4 @@
-use super::base64;
+use super::hex::*;
 
 #[derive(Debug)]
 enum Error {
@@ -13,7 +13,7 @@ fn fixed_xor(h1: &str, h2: &str) -> Result<String, Error> {
         return Err(DomainErr("Need equal number of bytes for each argument to perform fixed-width xor.".to_string()))
     }
     
-    if let (Some(h1_b), Some(h2_b)) = (base64::hex_as_bytes(h1), base64::hex_as_bytes(h2)) {
+    if let (Some(h1_b), Some(h2_b)) = (hex_as_bytes(h1), hex_as_bytes(h2)) {
         let out_bytes = h1_b.into_iter().zip(h2_b.into_iter()).map(|(b1, b2)| b1 ^ b2).collect::<Vec<u8>>();
         let mut acc = String::from("");
         for byte in out_bytes {

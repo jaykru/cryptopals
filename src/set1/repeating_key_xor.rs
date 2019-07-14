@@ -1,4 +1,4 @@
-use super::base64::*;
+use super::hex::*;
 use super::single_xor::*;
 
 fn repeating_key_xor(i: &[u8], key: &[u8]) -> Vec<u8> {
