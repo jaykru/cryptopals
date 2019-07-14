@@ -1,3 +1,4 @@
+use super::base64::*;
 use super::single_xor::*;
 
 fn repeating_key_xor(i: &[u8], key: &[u8]) -> Vec<u8> {
@@ -8,11 +9,9 @@ fn repeating_key_xor(i: &[u8], key: &[u8]) -> Vec<u8> {
 
 #[test]
 fn test_repeating_key_xor() {
-    if let Ok(v) = single_xor("6a6179", 0x41) {
-        if let Ok(s) = String::from_utf8(v) {
-            if let Ok(ss) = repeating_key_xor("jay", &vec![0x41]) {
-                assert_eq!(s,ss);
-            }
-        }
+    let v = single_xor(&hex_as_bytes("6a6179").unwrap(),0x41); 
+    if let Ok(s) = String::from_utf8(v) {
+        let ss = repeating_key_xor(&vec![b'j',b'a',b'y'], &vec![0x41]);
+        assert_eq!(s.as_bytes().to_vec(),ss);
     }
 }

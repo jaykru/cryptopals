@@ -1,4 +1,5 @@
 use super::base64;
+use super::fixed_xor;
 
 #[derive(Debug)]
 pub enum Error {
@@ -9,6 +10,5 @@ pub enum Error {
 use Error::*;
 
 pub fn single_xor(h: &[u8], k: u8) -> Vec<u8> {
-    let out_bytes = h.into_iter().map(|bp| bp ^ k).collect::<Vec<u8>>();
-    out_bytes
+    h.into_iter().map(|b| b ^ k).collect::<Vec<u8>>()
 }

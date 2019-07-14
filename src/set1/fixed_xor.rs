@@ -8,7 +8,7 @@ enum Error {
 
 use Error::{DomainErr, FormatErr};
 
-fn fixed_xor(h1: String, h2: String) -> Result<String, Error> {
+fn fixed_xor(h1: &str, h2: &str) -> Result<String, Error> {
     if h1.len() != h2.len() {
         return Err(DomainErr("Need equal number of bytes for each argument to perform fixed-width xor.".to_string()))
     }
@@ -28,7 +28,7 @@ fn fixed_xor(h1: String, h2: String) -> Result<String, Error> {
 
 #[test]
 fn test_fixed_xor() {
-    if let Ok(s) = fixed_xor("1c0111001f010100061a024b53535009181c".to_string(),"686974207468652062756c6c277320657965".to_string()) {
+    if let Ok(s) = fixed_xor("1c0111001f010100061a024b53535009181c","686974207468652062756c6c277320657965") {
         println!("{}", s);
         assert_eq!(s, "746865206b696420646f6e277420706c6179".to_string());
     }

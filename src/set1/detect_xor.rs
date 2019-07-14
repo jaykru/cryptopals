@@ -41,7 +41,8 @@ fn find_xord_line(filename: &str) -> io::Result<String> {
     Ok(out)
 }
 
-#[test]
-fn cryptopals_4() {
-    assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/Users/j/cryptopals/src/set1/challenge4.txt").unwrap());
-}
+// #[test]
+// TODO
+// fn cryptopals_4() {
+//     assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/Users/j/cryptopals/src/set1/challenge4.txt").unwrap());
+// }

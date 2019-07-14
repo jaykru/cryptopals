@@ -31,6 +31,8 @@ pub fn score(input: &[u8]) -> f64 {
          ('q',0.095),
          ('z',0.074),
          ('E',12.702),
+         ('\u{0020}',4.000),
+         ('\'',2.000),
          ('T',9.056),
          ('A',8.167),
          ('O',7.507),
@@ -55,15 +57,12 @@ pub fn score(input: &[u8]) -> f64 {
          ('J',0.153),
          ('X',0.150),
          ('Q',0.095),
-         ('Z',0.074),
-         ('\n',-100.0),
-         ('*',-10.0),
-         ('\'', 0.005),
-         ('`', -1000.0)].iter().cloned().collect();
+         ('Z',0.074),].iter().cloned().collect();
     
     let mut sum: f64 = 0.0;
     for u in input {
-        sum += *char_freqs.entry(*u as char).or_insert(-5.0);
+        // DEBUG: println!("{} has score {}", *u as char, *char_freqs.entry(*u as char).or_insert(-10.0));
+        sum += *char_freqs.entry(*u as char).or_insert(-10.0);
     };
     sum
 }
@@ -74,12 +73,20 @@ pub fn find_best(input: &[u8]) -> Option<Vec<u8>> {
         let score = score(&bytes);
         (bytes, score)
     });
-    let mut best = -1.0;
+    let mut best = 0.0;
     let mut best_bytes: Option<Vec<u8>> = None;
     for (bytes, score) in with_scores {
-        if score > best {
+        if score >= best {
             best = score;
-            best_bytes = Some(bytes);
+            best_bytes = Some(bytes.clone());
+
+            println!("current best: {} with score: {}", String::from_utf8(bytes.clone()).unwrap(), score);
+        }
+        
+        if let Ok(s) = String::from_utf8(bytes.clone()) {
+            println!("tried: {} with score: {}", s, score);
+        } else {
+            println!("tried unprintable {:#?}", bytes)
         }
     }
     best_bytes
@@ -101,56 +108,14 @@ pub fn find_best_key(input: &[u8]) -> Option<u8> {
     best_key
 }
 
-// pub fn find_best_string(input: &str) -> String {
-//     let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
-//         if let Ok(bytes) = single_xor(i,key) {
-//             if let Ok(dec) = std::str::from_utf8(&bytes) {
-//                 (String::from(dec), score(dec))
-//             } else {
-//                 (String::from(""), -1.0)
-//             }
-//         } else {
-//             (String::from(""), -1.0)
-//         }});
-//     let mut best = 0.0;
-//     let mut best_dec = String::from("");
-//     for (dec, score) in with_scores {
-//         if score >= best {
-//             best = score;
-//             best_dec = dec;
-//         }
-//     }
-//     best_dec
-// }
-
-// pub fn find_best_string_key(input: &str) -> u8 {
-//     let with_scores = iter::repeat(input).zip(1 ..= std::u8::MAX).map(|(i, key)| { 
-//         if let Ok(bytes) = single_xor(i,key) {
-//             if let Ok(dec) = std::str::from_utf8(&bytes) {
-//                 (key, score(dec))
-//             } else {
-//                 (key, -1.0)
-//             }
-//         } else {
-//             (key, -1.0)
-//         }});
-//     let mut best = 0.0;
-//     let mut best_key = 0;
-//     for (key, score) in with_scores {
-//         if score >= best {
-//             best = score;
-//             best_key = key;
-//         }
-//     }
-//     best_key
-// }
-
 #[test]
 fn test_score() {
-    assert_eq!(108.079, score("Cooking MC's like a pound of bacon"));
+    assert_eq!(138.07399999999998, score("Cooking MC's like a pound of bacon".as_bytes()));
 }
 
 #[test]
-fn test_find_best_string() {
-    assert_eq!("Cooking MC\'s like a pound of bacon".to_string(), find_best_string("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"));
+fn test_find_best() {
+    if let Ok(s) = String::from_utf8(find_best("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".as_bytes()).unwrap()) {
+        assert_eq!("Cooking MC\'s like a pound of bacon".to_string(), s);
+    }
 }

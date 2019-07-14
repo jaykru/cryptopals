@@ -80,7 +80,7 @@ fn possible_keys(enc: &[u8]) -> Vec<Vec<u8>> {
         );
         let mut key = Vec::new();
         for block in transposed {
-            let keybyte = find_best_key(&block);
+            let keybyte = find_best_key(&block).unwrap();
             key.push(keybyte);
         }
         // solve each transposed block as if single-char XOR
@@ -93,7 +93,7 @@ fn possible_keys(enc: &[u8]) -> Vec<Vec<u8>> {
 
 #[test]
 fn test_hamming() {
-    assert_eq!(hamming("this is a test", "wokka wokka!!!").unwrap(), 37)
+    assert_eq!(hamming("this is a test".as_bytes(), "wokka wokka!!!".as_bytes()).unwrap(), 37)
 }
 
 #[test]
@@ -101,10 +101,7 @@ fn test_possible_keys() {
     println!(
         "{:?}",
         &possible_keys(
-            &hex_as_bytes(
-                "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272"
-                    .to_string()
-            )
+            &hex_as_bytes("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272")
             .unwrap()
         )
     );
