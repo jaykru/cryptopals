@@ -33,6 +33,11 @@ fn hamming(a: &[u8], b: &[u8]) -> Result<u64, ()> {
     }
 }
 
+#[test]
+fn test_hamming() {
+    assert_eq!(hamming("this is a test".as_bytes(), "wokka wokka!!!".as_bytes()).unwrap(), 37)
+}
+
 fn norm_dist(guess: usize, enc: &[u8]) -> u64 {
     let keysize: usize = guess;
     println!("keysize: {}", keysize);
@@ -89,11 +94,6 @@ fn possible_keys(enc: &[u8]) -> Vec<Vec<u8>> {
         keyguesses.push(key);
     }
     keyguesses
-}
-
-#[test]
-fn test_hamming() {
-    assert_eq!(hamming("this is a test".as_bytes(), "wokka wokka!!!".as_bytes()).unwrap(), 37)
 }
 
 #[test]
