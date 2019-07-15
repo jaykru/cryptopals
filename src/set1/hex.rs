@@ -13,7 +13,6 @@ fn pair_to_num(p: Vec<u8>) -> Option<u8> {
         [first, second] => {
             if let Some(f) = hex_digit(*first) {
                 if let Some(s) = hex_digit(*second) {
-                    println!("f: {}; s: {}",f,s);
                     Some(f * 16 + s)
                 } else {
                     None
