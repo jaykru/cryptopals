@@ -83,7 +83,9 @@ pub fn find_best(input: &[u8]) -> Option<Vec<u8>> {
         if score >= best {
             best = score;
             best_bytes = Some(bytes);
+            println!("updated best for {:#?}", input);
         }
+        println!("passed on on score {}", score);
     }
     best_bytes
 }

@@ -17,8 +17,16 @@ fn compare_f64(a: f64, b: f64) -> Ordering {
     }
 }
 
-fn compare_scores(a: &[u8], b: &[u8]) -> Ordering {
-    compare_f64(score(a), score(b))
+fn compare_scores(a: &Option<Vec<u8>>, b: &Option<Vec<u8>>) -> Ordering {
+    let a_score = match a {
+        None => 0.0,
+        Some(ap) => score(ap),
+    };
+    let b_score = match b {
+        None => 0.0,
+        Some(bp) => score(bp),
+    };
+    compare_f64(a_score, b_score)
 }
 
 fn find_xord_line(filename: &str) -> io::Result<String> {
@@ -27,13 +35,14 @@ fn find_xord_line(filename: &str) -> io::Result<String> {
 
     let line = f
         .lines()
-        .sorted_by(|a, b| {
+        .sorted_by(|b, a| {
+            println!("a: {}", &a.as_ref().unwrap());
+            println!("b: {}", &b.as_ref().unwrap());
             compare_scores(
-                &find_best(&a.as_ref().unwrap().as_bytes()).unwrap(),
-                &find_best(&b.as_ref().unwrap().as_bytes()).unwrap(),
+                &find_best(a.as_ref().unwrap().as_bytes()),
+                &find_best(b.as_ref().unwrap().as_bytes()),
             )
         })
-        .rev()
         .next()
         .unwrap()
         .unwrap();
@@ -41,8 +50,7 @@ fn find_xord_line(filename: &str) -> io::Result<String> {
     Ok(out)
 }
 
-// #[test]
-// TODO
-// fn cryptopals_4() {
-//     assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/Users/j/cryptopals/src/set1/challenge4.txt").unwrap());
-// }
+#[test]
+fn cryptopals_4() {
+     assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/home/j/cryptopals/src/set1/challenge4.txt").unwrap());
+}
