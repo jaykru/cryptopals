@@ -46,11 +46,11 @@ fn find_xord_line(filename: &str) -> io::Result<String> {
         .next()
         .unwrap()
         .unwrap();
-    let out = format!("{}: {:#?}", line, find_best(&line.as_bytes()));
+    let out = format!("{}: {:#?}", line, String::from_utf8(find_best(&line.as_bytes()).unwrap()).unwrap());
     Ok(out)
 }
 
 #[test]
 fn cryptopals_4() {
-     assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/home/j/cryptopals/src/set1/challenge4.txt").unwrap());
+     assert_eq!("7b5a4215415d544115415d5015455447414c155c46155f4058455c5b523f: nOW\u{0}THAT\u{0}THE\u{0}PARTY\u{0}IS\u{0}JUMPING*".to_string(), find_xord_line("/home/j/cryptopals/src/set1/4.txt").unwrap());
 }
