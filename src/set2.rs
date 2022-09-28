@@ -1,4 +1,5 @@
-mod pkcs7; // 9
+mod pkcs7;
+pub mod challenge12; // 9
 //mod cbc; // 10
 //mod detectmodeoracle; // 11
 //mod bytedecryptecb; // 12

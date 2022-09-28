@@ -202,7 +202,7 @@ fn test_get_random_aes_key() {
 }
 
 #[derive(PartialEq, Eq, Debug)]
-enum EncType {
+pub(crate) enum EncType {
     Ecb,
     Cbc,
 }
@@ -270,11 +270,11 @@ where
     idx
 }
 
-#[test]
+/* #[test]
 fn test_repeats() {
     println!("{}", repeats_from_start("ACABACABACAB".as_bytes()));
     assert!(false)
-}
+} */
 
 fn exercise12() {
     let secret = base64::decode(

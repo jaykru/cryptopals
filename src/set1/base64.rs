@@ -1,5 +1,5 @@
 use super::hex::*;
-///* set 1, challenge 1 *///
+// set 1, challenge 1
 use bit_vec::BitVec;
 use itertools::Itertools;
 
